@@ -1,9 +1,12 @@
 module.exports = {
   root: true,
-  extends: ['eslint:recommended'],
+  extends: ['eslint:recommended', 'plugin:ava/recommended'],
   env: {
     es6: true,
     node: true,
+  },
+  parserOptions: {
+    sourceType: 'module',
   },
   overrides: [
     {
@@ -15,7 +18,7 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       parserOptions: {
         ecmaVersion: 2018,
-        project: './tsconfig.json',
+        project: './tsconfig.eslint.json',
         sourceType: 'module',
         tsconfigRootDir: __dirname,
         warnOnUnsupportedTypeScriptVersion: true,
