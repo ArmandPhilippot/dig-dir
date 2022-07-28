@@ -1,0 +1,24 @@
+# build
+dist
+
+# cache
+.eslintcache
+*.tsbuildinfo
+
+# dependencies
+node_modules
+
+# dotenv
+.env*
+!.env.example
+
+# editor
+.vscode
+
+# logs
+logs
+*.log
+pnpm-debug.log*
+
+# misc
+.DS_Store
