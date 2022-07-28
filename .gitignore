@@ -15,6 +15,9 @@ node_modules
 # editor
 .vscode
 
+# fixtures
+tests/fixtures
+
 # logs
 logs
 *.log

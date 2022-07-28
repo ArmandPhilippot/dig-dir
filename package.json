@@ -40,6 +40,8 @@
     "prepare": "husky install && pnpm build",
     "release": "standard-version -s",
     "test": "ava",
+    "test:fixtures:clean": "sh bin/remove-test-fixtures.sh",
+    "test:fixtures:prepare": "sh bin/create-test-fixtures.sh",
     "test:watch": "ava --watch",
     "watch": "pnpm tsc --watch --sourceMap"
   },
