@@ -1,20 +1,49 @@
 import { readdir, stat } from 'fs/promises';
 import { basename, resolve } from 'path';
-import { Directory, FileOrDirectory, RegularFile } from './ts/types.js';
-import { getFiletype, removeEmpty } from './utils/helpers.js';
+import {
+  Directory,
+  FileOrDirectory,
+  RegularFile,
+  WalkDirOptions,
+} from './ts/types.js';
+import {
+  getFilesIn,
+  getFiletype,
+  getSubdirectoriesIn,
+  removeEmpty,
+} from './utils/helpers.js';
 import { getDirname } from './utils/paths.js';
 
-export const walkDir = async (root: string) => {
+const defaultOptions: WalkDirOptions = {
+  recursive: true,
+};
+
+/**
+ * Walk through a directory.
+ *
+ * @param {string} root - The starting directory path.
+ * @param {WalkDirOptions} options - An object of options.
+ * @param {string[]} acc - An accumulator to keep track of starting path.
+ * @returns {Promise<(Directory | RegularFile)[]>} The directory contents.
+ */
+export const walkDir = async (
+  root: string,
+  options: WalkDirOptions = defaultOptions,
+  acc: string[] = []
+): Promise<(Directory | RegularFile)[]> => {
   const rootAbsolutePath = resolve(getDirname(import.meta), root);
   const rootData = await readdir(rootAbsolutePath, {
     encoding: 'utf8',
     withFileTypes: true,
   });
 
+  acc.push(rootAbsolutePath);
+  const initialPath = acc[0] || rootAbsolutePath;
+
   return Promise.all(
     rootData.map(async (fileOrDir) => {
       const fileOrDirPath = `${rootAbsolutePath}/${fileOrDir.name}`;
-      const relativePath = fileOrDirPath.replace(rootAbsolutePath, '.');
+      const relativePath = fileOrDirPath.replace(initialPath, '.');
       const { birthtime, mtime } = await stat(fileOrDirPath);
       const sharedData: FileOrDirectory = {
         createdAt: birthtime.toISOString(),
@@ -26,8 +55,18 @@ export const walkDir = async (root: string) => {
       };
 
       if (fileOrDir.isDirectory()) {
+        const dirData =
+          options.recursive && (await walkDir(fileOrDirPath, options, acc));
+        const dirChildren = dirData
+          ? {
+              files: getFilesIn(dirData),
+              subdirectories: getSubdirectoriesIn(dirData),
+            }
+          : {};
+
         return {
           ...sharedData,
+          ...dirChildren,
         } as Directory;
       }
 
