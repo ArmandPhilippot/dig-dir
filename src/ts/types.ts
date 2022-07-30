@@ -17,10 +17,14 @@ export type FileOrDirectory<T extends FileType = FileType> = {
 
 export type Directory = FileOrDirectory<FileType.DIRECTORY> & {
   files?: RegularFile[];
-  subDirectories?: Directory[];
+  subdirectories?: Directory[];
 };
 
 export type RegularFile = FileOrDirectory<FileType.FILE> & {
   content?: string;
   extension?: string;
+};
+
+export type WalkDirOptions = {
+  recursive?: boolean;
 };

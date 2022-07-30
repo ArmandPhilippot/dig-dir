@@ -1,5 +1,6 @@
 import { Dirent } from 'fs';
 import { FileType } from '../ts/enums.js';
+import { Directory, RegularFile } from '../ts/types.js';
 
 /**
  * Retrieve a FileType from a Dirent object.
@@ -22,4 +23,30 @@ export const getFiletype = (dirent: Dirent): FileType => {
 export const removeEmpty = <T>(data: T | undefined | null): data is T => {
   if (data === null || data === undefined) return false;
   return true;
+};
+
+/**
+ * Retrieve the subdirectories in a directory content.
+ *
+ * @param {(Directory | RegularFile)[]} dir - A directory content.
+ * @returns {Directory[]} The subdirectories.
+ */
+export const getSubdirectoriesIn = (
+  dir: (Directory | RegularFile)[]
+): Directory[] => {
+  return dir.filter(
+    (fileOrDir) => fileOrDir.type === FileType.DIRECTORY
+  ) as Directory[];
+};
+
+/**
+ * Retrieve the files in a directory content.
+ *
+ * @param {(Directory | RegularFile)[]} dir - A directory content.
+ * @returns {RegularFile[]} The files.
+ */
+export const getFilesIn = (dir: (Directory | RegularFile)[]): RegularFile[] => {
+  return dir.filter(
+    (fileOrDir) => fileOrDir.type === FileType.FILE
+  ) as RegularFile[];
 };
