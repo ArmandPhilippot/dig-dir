@@ -1,5 +1,5 @@
-import { readdir, stat } from 'fs/promises';
-import { basename, resolve } from 'path';
+import { readdir, readFile, stat } from 'fs/promises';
+import { basename, extname, resolve } from 'path';
 import {
   Directory,
   FileOrDirectory,
@@ -15,6 +15,7 @@ import {
 import { getDirname } from './utils/paths.js';
 
 const defaultOptions: WalkDirOptions = {
+  includeFileContent: false,
   recursive: true,
 };
 
@@ -73,6 +74,8 @@ export const walkDir = async (
       if (fileOrDir.isFile()) {
         return {
           ...sharedData,
+          content: await readFile(fileOrDirPath, 'utf8'),
+          extension: extname(fileOrDir.name),
         } as RegularFile;
       }
 

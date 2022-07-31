@@ -26,5 +26,6 @@ export type RegularFile = FileOrDirectory<FileType.FILE> & {
 };
 
 export type WalkDirOptions = {
+  includeFileContent?: boolean;
   recursive?: boolean;
 };
