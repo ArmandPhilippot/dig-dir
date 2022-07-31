@@ -57,3 +57,21 @@ test('does not return root subdirectories content if not recursive', async (t) =
     t.falsy(subDir.subdirectories);
   });
 });
+
+test('includes files content if option is activated', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { includeFileContent: true });
+  const rootFiles = getFilesIn(root);
+
+  rootFiles.forEach((file) => {
+    t.truthy(file.content);
+  });
+});
+
+test('does not include files content if option is deactivated', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { includeFileContent: false });
+  const rootFiles = getFilesIn(root);
+
+  rootFiles.forEach((file) => {
+    t.truthy(file.content);
+  });
+});
