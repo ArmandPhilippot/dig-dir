@@ -24,7 +24,7 @@ import { getDirname } from './utils/paths.js';
  * @param {string} root - The starting directory path.
  * @param {WalkDirOptions<T>} options - An object of options.
  * @param {string[]} acc - An accumulator to keep track of starting path.
- * @returns {Promise<WalkDirOutput[V]>} The directory contents.
+ * @returns {Promise<WalkDirReturn<T>>} The directory contents.
  */
 export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   root: string,
@@ -45,6 +45,10 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
 
   const data = await Promise.all(
     rootData.map(async (fileOrDir) => {
+      if (filters?.filename && !fileOrDir.name.includes(filters.filename)) {
+        return undefined;
+      }
+
       const fileOrDirPath = `${rootAbsolutePath}/${fileOrDir.name}`;
       const relativePath = fileOrDirPath.replace(initialPath, '.');
       const { birthtime, mtime } = await stat(fileOrDirPath);

@@ -33,6 +33,7 @@ export type RegularFile = FileOrDirectory<FileType.FILE> & {
 export type TypeFilter = FileType.DIRECTORY | FileType.FILE;
 
 export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
+  filename?: string;
   type?: T;
 };
 
