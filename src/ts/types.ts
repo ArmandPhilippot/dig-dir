@@ -5,6 +5,8 @@ import { FileType } from './enums.js';
  */
 export type Maybe<T> = T | undefined;
 
+export type Extension = `.${string}` | '';
+
 export type FileOrDirectoryParent = {
   name: string;
   path: string;
@@ -27,12 +29,13 @@ export type Directory = FileOrDirectory<FileType.DIRECTORY> & {
 
 export type RegularFile = FileOrDirectory<FileType.FILE> & {
   content?: string;
-  extension?: string;
+  extension?: Extension;
 };
 
 export type TypeFilter = FileType.DIRECTORY | FileType.FILE;
 
 export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
+  extensions?: Extension[];
   filename?: string;
   type?: T;
 };

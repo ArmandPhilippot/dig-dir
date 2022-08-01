@@ -3,6 +3,7 @@ import { basename, extname, resolve } from 'path';
 import { FileType } from './ts/enums.js';
 import {
   Directory,
+  Extension,
   FileOrDirectory,
   Maybe,
   RegularFile,
@@ -87,10 +88,16 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
       if (fileOrDir.isFile()) {
         if (filters?.type === FileType.DIRECTORY) return undefined;
 
+        const extension = extname(fileOrDir.name) as Extension;
+
+        if (filters?.extensions && !filters.extensions.includes(extension)) {
+          return undefined;
+        }
+
         return {
           ...sharedData,
           content: await readFile(fileOrDirPath, 'utf8'),
-          extension: extname(fileOrDir.name),
+          extension,
         } as RegularFile;
       }
 
