@@ -3,6 +3,7 @@ import { Dirent } from 'fs';
 import { readdir } from 'fs/promises';
 import { resolve } from 'path';
 import { walkDir } from '../dist/index.js';
+import { FileType } from '../dist/ts/enums.js';
 import { getFilesIn, getSubdirectoriesIn } from '../dist/utils/helpers.js';
 import { getDirname } from '../dist/utils/paths.js';
 
@@ -73,5 +74,28 @@ test('does not include files content if option is deactivated', async (t) => {
 
   rootFiles.forEach((file) => {
     t.truthy(file.content);
+  });
+});
+
+test('returns only directories when filtering by directory filetype', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { type: FileType.DIRECTORY },
+    recursive: true,
+  });
+
+  root.forEach((fileOrDir) => {
+    t.is(fileOrDir.type, FileType.DIRECTORY);
+    t.is(fileOrDir.files?.length, 0);
+  });
+});
+
+test('returns only files when filtering by file filetype', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { type: FileType.FILE },
+    recursive: true,
+  });
+
+  root.forEach((fileOrDir) => {
+    t.is(fileOrDir.type, FileType.FILE);
   });
 });
