@@ -3,6 +3,8 @@ import { Dirent } from 'fs';
 import { readdir } from 'fs/promises';
 import { resolve } from 'path';
 import { walkDir } from '../dist/index.js';
+import { FileType } from '../dist/ts/enums.js';
+import { Directory, Extension, RegularFile } from '../dist/ts/types.js';
 import { getFilesIn, getSubdirectoriesIn } from '../dist/utils/helpers.js';
 import { getDirname } from '../dist/utils/paths.js';
 
@@ -74,4 +76,89 @@ test('does not include files content if option is deactivated', async (t) => {
   rootFiles.forEach((file) => {
     t.truthy(file.content);
   });
+});
+
+test('returns only directories when filtering by directory filetype', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { type: FileType.DIRECTORY },
+    recursive: true,
+  });
+
+  root.forEach((fileOrDir) => {
+    t.is(fileOrDir.type, FileType.DIRECTORY);
+    t.is(fileOrDir.files?.length, 0);
+  });
+});
+
+test('returns only files when filtering by file filetype', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { type: FileType.FILE },
+    recursive: true,
+  });
+
+  root.forEach((fileOrDir) => {
+    t.is(fileOrDir.type, FileType.FILE);
+  });
+});
+
+test('returns only files and/or directories with the given filename', async (t) => {
+  const filename = '-1';
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { filename },
+    recursive: true,
+  });
+  const filenameRegex = new RegExp(filename, 'i');
+
+  const doesFilenameMatchRegex = (filename: string) => {
+    return t.regex(filename, filenameRegex);
+  };
+
+  const checkFilenames = (filesOrDirs?: (Directory | RegularFile)[]) => {
+    if (filesOrDirs)
+      filesOrDirs.forEach((fileOrDir) => {
+        doesFilenameMatchRegex(fileOrDir.name);
+
+        if (fileOrDir.type === FileType.DIRECTORY) {
+          checkFilenames(fileOrDir.subdirectories);
+          checkFilenames(fileOrDir.files);
+        }
+      });
+  };
+
+  checkFilenames(root);
+});
+
+test('returns only files of the given extensions', async (t) => {
+  const extensions: Extension[] = ['.md', '.doc'];
+  const extRegex = extensions.join('||');
+  const root = await walkDir(FIXTURES_PATH, {
+    filters: { extensions },
+    recursive: true,
+  });
+
+  const doesExtensionMatchRegex = (extension: Extension) => {
+    return t.regex(extension as string, new RegExp(extRegex));
+  };
+
+  const checkFileExtension = (file: RegularFile) => {
+    if (file.extension !== undefined) doesExtensionMatchRegex(file.extension);
+  };
+
+  const checkFilesExtensions = (files?: RegularFile[]) => {
+    if (files) files.forEach((file) => checkFileExtension(file));
+  };
+
+  const checkExtensions = (filesOrDirs?: (Directory | RegularFile)[]) => {
+    if (filesOrDirs)
+      filesOrDirs.forEach((fileOrDir) => {
+        if (fileOrDir.type === FileType.FILE) {
+          checkFileExtension(fileOrDir);
+        } else {
+          checkFilesExtensions(fileOrDir.files);
+          checkExtensions(fileOrDir.subdirectories);
+        }
+      });
+  };
+
+  checkExtensions(root);
 });

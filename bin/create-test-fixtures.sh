@@ -30,22 +30,25 @@ create_directory() {
 # Arguments:
 #   1. The path where to create the file
 #   2. The filename
-#   3. (Optional) The file content
+#   3. The extension without dot (`txt` for example)
+#   4. (Optional) The file content
 ##############################################################
 create_file() {
-  if [ $# -lt 1 ] || [ $# -gt 3 ]; then
+  if [ $# -lt 1 ] || [ $# -gt 4 ]; then
     error_unexpected
   fi
 
   local _path
   local _filename
+  local _extension
   local _content
 
   _path=$1
   _filename=$2
-  _content=${3:-""}
+  _extension=$3
+  _content=${4:-""}
 
-  echo "$_content" >"${_path}/${_filename}"
+  echo "$_content" >"${_path}/${_filename}.${_extension}"
 }
 
 ##############################################################
@@ -69,12 +72,14 @@ create_files() {
   _index=1
 
   while [ "$_index" -le "$_total" ]; do
-    _filename="file${_index}.txt"
+    _filename="file${_index}"
 
     if ((_index % 2)); then
-      create_file "$_path" "$_filename"
+      create_file "$_path" "$_filename" "txt"
+    elif ((_index % 3)); then
+      create_file "$_path" "$_filename" "md"
     else
-      create_file "$_path" "$_filename" "Quia voluptas officia recusandae quia suscipit et assumenda adipisci."
+      create_file "$_path" "$_filename" "txt" "Quia voluptas officia recusandae quia suscipit et assumenda adipisci."
     fi
 
     _index=$(("$_index" + 1))
@@ -166,7 +171,7 @@ create_directories_with_subdirectories() {
 
     create_directory "$_path" "$_folder_name"
     create_empty_directories "${_path}/${_folder_name}" "$_total_subdir"
-    create_directories_with_files "${_path}/${_folder_name}" "$_total_subdir"
+    create_directories_with_files "${_path}/${_folder_name}" "$_total_subdir" 3
     _index=$(("$_index" + 1))
   done
 }
@@ -213,7 +218,7 @@ init() {
   go_to_scripts_directory
 
   if [ -d "$_FIXTURES_PATH" ]; then
-    create_files "$_FIXTURES_PATH" 3
+    create_files "$_FIXTURES_PATH" 5
     create_empty_directories "$_FIXTURES_PATH" 2
     create_directories_with_files "$_FIXTURES_PATH" 2 2
     create_directories_with_subdirectories "$_FIXTURES_PATH" 2 1

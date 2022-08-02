@@ -1,10 +1,15 @@
 import { readdir, readFile, stat } from 'fs/promises';
 import { basename, extname, resolve } from 'path';
+import { FileType } from './ts/enums.js';
 import {
   Directory,
+  Extension,
   FileOrDirectory,
+  Maybe,
   RegularFile,
+  TypeFilter,
   WalkDirOptions,
+  WalkDirReturn,
 } from './ts/types.js';
 import {
   getFilesIn,
@@ -14,24 +19,22 @@ import {
 } from './utils/helpers.js';
 import { getDirname } from './utils/paths.js';
 
-const defaultOptions: WalkDirOptions = {
-  includeFileContent: false,
-  recursive: true,
-};
-
 /**
  * Walk through a directory.
  *
  * @param {string} root - The starting directory path.
- * @param {WalkDirOptions} options - An object of options.
+ * @param {WalkDirOptions<T>} options - An object of options.
  * @param {string[]} acc - An accumulator to keep track of starting path.
- * @returns {Promise<(Directory | RegularFile)[]>} The directory contents.
+ * @returns {Promise<WalkDirReturn<T>>} The directory contents.
  */
-export const walkDir = async (
+export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   root: string,
-  options: WalkDirOptions = defaultOptions,
+  { includeFileContent, filters, recursive }: WalkDirOptions<T> = {
+    includeFileContent: false,
+    recursive: true,
+  },
   acc: string[] = []
-): Promise<(Directory | RegularFile)[]> => {
+): Promise<WalkDirReturn<T>> => {
   const rootAbsolutePath = resolve(getDirname(import.meta), root);
   const rootData = await readdir(rootAbsolutePath, {
     encoding: 'utf8',
@@ -41,8 +44,12 @@ export const walkDir = async (
   acc.push(rootAbsolutePath);
   const initialPath = acc[0] || rootAbsolutePath;
 
-  return Promise.all(
+  const data = await Promise.all(
     rootData.map(async (fileOrDir) => {
+      if (filters?.filename && !fileOrDir.name.includes(filters.filename)) {
+        return undefined;
+      }
+
       const fileOrDirPath = `${rootAbsolutePath}/${fileOrDir.name}`;
       const relativePath = fileOrDirPath.replace(initialPath, '.');
       const { birthtime, mtime } = await stat(fileOrDirPath);
@@ -56,8 +63,15 @@ export const walkDir = async (
       };
 
       if (fileOrDir.isDirectory()) {
+        if (filters?.type === FileType.FILE) return undefined;
+
         const dirData =
-          options.recursive && (await walkDir(fileOrDirPath, options, acc));
+          recursive &&
+          (await walkDir(
+            fileOrDirPath,
+            { includeFileContent, filters, recursive },
+            acc
+          ));
         const dirChildren = dirData
           ? {
               files: getFilesIn(dirData),
@@ -72,16 +86,26 @@ export const walkDir = async (
       }
 
       if (fileOrDir.isFile()) {
+        if (filters?.type === FileType.DIRECTORY) return undefined;
+
+        const extension = extname(fileOrDir.name) as Extension;
+
+        if (filters?.extensions && !filters.extensions.includes(extension)) {
+          return undefined;
+        }
+
         return {
           ...sharedData,
           content: await readFile(fileOrDirPath, 'utf8'),
-          extension: extname(fileOrDir.name),
+          extension,
         } as RegularFile;
       }
 
       return undefined;
     })
-  ).then((data) => data.filter(removeEmpty));
+  );
+
+  return data.filter(removeEmpty) as WalkDirReturn<T>;
 };
 
 export default walkDir;

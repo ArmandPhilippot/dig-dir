@@ -15,13 +15,13 @@ export const getFiletype = (dirent: Dirent): FileType => {
 };
 
 /**
- * Method to remove null or undefined data from an array.
+ * Method to remove undefined data from an array.
  *
  * @param data - A possible data.
  * @returns {boolean} True if it is an existing data.
  */
 export const removeEmpty = <T>(data: T | undefined | null): data is T => {
-  if (data === null || data === undefined) return false;
+  if (data === undefined) return false;
   return true;
 };
 
