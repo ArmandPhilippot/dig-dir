@@ -12,6 +12,11 @@ export type FileOrDirectoryParent = {
   path: string;
 };
 
+export type FileOrDirectoryPaths = {
+  absolute: string;
+  relative: string;
+};
+
 export type FileOrDirectory<T extends FileType = FileType> = {
   createdAt: string;
   id: string;

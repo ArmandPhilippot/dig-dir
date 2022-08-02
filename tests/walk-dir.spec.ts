@@ -6,9 +6,17 @@ import { walkDir } from '../dist/index.js';
 import { FileType } from '../dist/ts/enums.js';
 import { Directory, Extension, RegularFile } from '../dist/ts/types.js';
 import { getFilesIn, getSubdirectoriesIn } from '../dist/utils/helpers.js';
-import { getDirname } from '../dist/utils/paths.js';
 
-const FIXTURES_PATH = resolve(getDirname(import.meta), './fixtures/');
+/**
+ * Replicate `__dirname` variable.
+ *
+ * @returns {string} The `__dirname` equivalent.
+ */
+const getDirname = (): string => {
+  return new URL('.', import.meta.url).pathname;
+};
+
+const FIXTURES_PATH = resolve(getDirname(), './fixtures/');
 
 const test = anyTest as TestFn<{
   fixtures: Dirent[];
