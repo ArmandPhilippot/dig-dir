@@ -96,7 +96,9 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
 
         return {
           ...sharedData,
-          content: await readFile(fileOrDirPath, 'utf8'),
+          content: includeFileContent
+            ? await readFile(fileOrDirPath, 'utf8')
+            : undefined,
           extension,
         } as RegularFile;
       }

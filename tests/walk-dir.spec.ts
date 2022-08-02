@@ -74,7 +74,7 @@ test('does not include files content if option is deactivated', async (t) => {
   const rootFiles = getFilesIn(root);
 
   rootFiles.forEach((file) => {
-    t.truthy(file.content);
+    t.is(file.content, undefined);
   });
 });
 
