@@ -48,6 +48,42 @@ test('returns the correct number of files & directories in root folder', async (
   t.is(rootFiles.length, filesFixturesCount);
 });
 
+test('returns the correct number of properties', async (t) => {
+  const root = await walkDir(FIXTURES_PATH);
+
+  const extensionRegex = /^\.||''/;
+
+  root.forEach((fileOrDir) => {
+    t.truthy(fileOrDir.createdAt);
+    t.truthy(fileOrDir.id);
+    t.truthy(fileOrDir.name);
+    t.truthy(fileOrDir.path);
+    t.truthy(fileOrDir.type);
+    t.truthy(fileOrDir.updatedAt);
+    t.falsy(fileOrDir.parent);
+
+    if (fileOrDir.type === FileType.DIRECTORY) {
+      t.truthy(fileOrDir.files);
+      t.truthy(fileOrDir.subdirectories);
+
+      fileOrDir.files?.forEach((file) => {
+        t.truthy(file.parent);
+      });
+
+      fileOrDir.subdirectories?.forEach((dir) => {
+        t.truthy(dir.parent);
+      });
+    } else if (fileOrDir.type === FileType.FILE) {
+      if (fileOrDir.extension !== undefined) {
+        t.regex(fileOrDir.extension, extensionRegex);
+      } else {
+        t.fail('missing extension');
+      }
+      t.falsy(fileOrDir.content);
+    }
+  });
+});
+
 test('returns root subdirectories content if recursive', async (t) => {
   const root = await walkDir(FIXTURES_PATH, { recursive: true });
   const rootDirectories = getSubdirectoriesIn(root);
