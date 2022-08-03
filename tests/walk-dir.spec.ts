@@ -170,3 +170,13 @@ test('returns only files of the given extensions', async (t) => {
 
   checkExtensions(root);
 });
+
+test('throws an error if path does not exist', async (t) => {
+  const nonexistingPath = './non-existing-folder';
+
+  const error = await t.throwsAsync(async () => {
+    await walkDir(nonexistingPath);
+  });
+
+  if (error) t.regex(error.message, /no such file or directory/i);
+});
