@@ -112,7 +112,37 @@ const getFileData = async <T extends Maybe<TypeFilter> = undefined>(
 };
 
 /**
+ * Retrieve a directory contents.
+ *
+ * @param {string} path - An absolute path to a directory.
+ * @param {string[]} acc - The walkDir accumulator.
+ * @returns {Promise<Dirent[] | undefined>} The directory contents if readable.
+ */
+const readdirSafely = async (
+  path: string,
+  acc: string[]
+): Promise<Dirent[] | undefined> => {
+  try {
+    return await readdir(path, {
+      encoding: 'utf8',
+      withFileTypes: true,
+    });
+  } catch (error) {
+    if (acc.length > 0) {
+      console.error(error);
+      return undefined;
+    } else {
+      throw error;
+    }
+  }
+};
+
+/**
  * Walk through a directory.
+ *
+ * If a protected directory is inside the root path, WalkDir will return some
+ * info about the protected directory but not its contents. If the protected
+ * directory is the root path, an error will be thrown.
  *
  * @param {string} root - An absolute path pointing to the starting directory.
  * @param {WalkDirOptions<T>} options - An object of options.
@@ -127,10 +157,7 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   },
   acc: string[] = []
 ): Promise<WalkDirReturn<T>> => {
-  const rootData = await readdir(root, {
-    encoding: 'utf8',
-    withFileTypes: true,
-  });
+  const rootData = await readdirSafely(root, acc);
 
   acc.push(root);
   const initialPath = acc[0] || root;
@@ -139,32 +166,34 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   const shouldOnlyIncludeFiles = filters?.type === FileType.FILE;
   const shouldOnlyIncludeDirectories = filters?.type === FileType.DIRECTORY;
 
-  const data = await Promise.all(
-    rootData.map(async (fileOrDir) => {
-      if (filters?.filename && !fileOrDir.name.includes(filters.filename)) {
-        return undefined;
-      }
-
-      const fileOrDirPath = `${root}/${fileOrDir.name}`;
-      const relativePath = fileOrDirPath.replace(initialPath, '.');
-      const paths = { absolute: fileOrDirPath, relative: relativePath };
-
-      switch (getFiletype(fileOrDir)) {
-        case FileType.DIRECTORY:
-          return shouldOnlyIncludeFiles
-            ? undefined
-            : getDirectoryData(fileOrDir, options, paths, acc);
-        case FileType.FILE:
-          return shouldOnlyIncludeDirectories
-            ? undefined
-            : getFileData(fileOrDir, options, paths);
-        default:
+  const data =
+    rootData &&
+    (await Promise.all(
+      rootData.map(async (fileOrDir) => {
+        if (filters?.filename && !fileOrDir.name.includes(filters.filename)) {
           return undefined;
-      }
-    })
-  );
+        }
 
-  return data.filter(removeEmpty) as WalkDirReturn<T>;
+        const fileOrDirPath = `${root}/${fileOrDir.name}`;
+        const relativePath = fileOrDirPath.replace(initialPath, '.');
+        const paths = { absolute: fileOrDirPath, relative: relativePath };
+
+        switch (getFiletype(fileOrDir)) {
+          case FileType.DIRECTORY:
+            return shouldOnlyIncludeFiles
+              ? undefined
+              : getDirectoryData(fileOrDir, options, paths, acc);
+          case FileType.FILE:
+            return shouldOnlyIncludeDirectories
+              ? undefined
+              : getFileData(fileOrDir, options, paths);
+          default:
+            return undefined;
+        }
+      })
+    ));
+
+  return data?.filter(removeEmpty) as WalkDirReturn<T>;
 };
 
 export default walkDir;
