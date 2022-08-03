@@ -233,6 +233,18 @@ WalkDir with default options will return this Javascript array of objects:
 ];
 ```
 
+## FAQ
+
+**Why the accumulator should be ignored?**
+
+To avoid repeats, Walk Dir is calling itself when the recursive option is set. To be able to return the relative path instead of an absolute path, Walk Dir needs to keep track of the path you have given. Each time Walk Dir is called, the current path is pushed to the accumulator. So `acc[0]` will always match the given path.
+
+**Why use a relative path?**
+
+I estimate that the relative path can be useful but the absolute path should not be public.
+
+As a developer, you know where is the starting path so you can easily retrieve the path which could cause an error from the relative path. However, if you want to use the Walk Dir data through an API, I think it is preferable to not provide the full path.
+
 ## License
 
 This project is open-source and released under the [MIT license](./LICENSE).
