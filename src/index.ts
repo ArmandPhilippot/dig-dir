@@ -21,6 +21,25 @@ import {
 } from './utils/helpers.js';
 
 /**
+ * Retrieve a parent object.
+ *
+ * @param {string} path - The current file or directory path.
+ * @param {string} filename - The current filename.
+ * @returns {FileOrDirectory['parent']} Maybe an object with name and path.
+ */
+const getParent = (
+  path: string,
+  filename: string
+): FileOrDirectory['parent'] => {
+  const parentPath = path.replace(`/${filename}`, '');
+  const parentName = basename(parentPath);
+
+  return parentName === '.'
+    ? undefined
+    : { name: parentName, path: parentPath };
+};
+
+/**
  * Retrieve the shared data between Directory and File objects.
  *
  * @param {Dirent} fileOrDir - A Dirent object.
@@ -37,6 +56,7 @@ const getSharedData = async <T extends FileType>(
     createdAt: birthtime.toISOString(),
     id: Buffer.from(paths.relative).toString('base64'),
     name: basename(fileOrDir.name),
+    parent: getParent(paths.relative, fileOrDir.name),
     path: paths.relative,
     type: getFiletype(fileOrDir) as T,
     updatedAt: mtime.toISOString(),
