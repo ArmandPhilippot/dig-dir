@@ -110,6 +110,21 @@ test('does not return root subdirectories content if depth equal 0', async (t) =
   });
 });
 
+test('returns subdirectories until allowed depth is reached', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { depth: 1 });
+  const rootDirectories = getSubdirectoriesIn(root);
+
+  rootDirectories.forEach((subDir) => {
+    t.truthy(subDir.files);
+    t.truthy(subDir.subdirectories);
+
+    subDir.subdirectories?.forEach((subDir) => {
+      t.falsy(subDir.files);
+      t.falsy(subDir.subdirectories);
+    });
+  });
+});
+
 test('includes files content if option is activated', async (t) => {
   const root = await walkDir(FIXTURES_PATH, { includeFileContent: true });
   const rootFiles = getFilesIn(root);
