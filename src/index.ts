@@ -16,28 +16,11 @@ import {
 import {
   getFilesIn,
   getFiletype,
+  getParent,
   getSubdirectoriesIn,
   removeEmpty,
+  shouldBeRecursive,
 } from './utils/helpers.js';
-
-/**
- * Retrieve a parent object.
- *
- * @param {string} path - The current file or directory path.
- * @param {string} filename - The current filename.
- * @returns {FileOrDirectory['parent']} Maybe an object with name and path.
- */
-const getParent = (
-  path: string,
-  filename: string
-): FileOrDirectory['parent'] => {
-  const parentPath = path.replace(`/${filename}`, '');
-  const parentName = basename(parentPath);
-
-  return parentName === '.'
-    ? undefined
-    : { name: parentName, path: parentPath };
-};
 
 /**
  * Retrieve the shared data between Directory and File objects.
@@ -80,7 +63,8 @@ const getDirectoryData = async <T extends Maybe<TypeFilter> = undefined>(
 ): Promise<Directory> => {
   const partialData = await getSharedData<FileType.DIRECTORY>(dir, paths);
   const dirData =
-    options.recursive && (await walkDir(paths.absolute, options, acc));
+    shouldBeRecursive(paths.relative, options.depth) &&
+    (await walkDir(paths.absolute, options, acc));
   const dirChildren = dirData
     ? {
         files: getFilesIn(dirData),
@@ -171,10 +155,7 @@ const readdirSafely = async (
  */
 export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   root: string,
-  options: WalkDirOptions<T> = {
-    includeFileContent: false,
-    recursive: true,
-  },
+  options: WalkDirOptions<T> = {},
   acc: string[] = []
 ): Promise<WalkDirReturn<T>> => {
   const rootData = await readdirSafely(root, acc);

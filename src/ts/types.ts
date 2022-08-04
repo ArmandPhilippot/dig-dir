@@ -48,7 +48,7 @@ export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
 export type WalkDirOptions<T extends Maybe<TypeFilter> = undefined> = {
   filters?: WalkDirFilters<T>;
   includeFileContent?: boolean;
-  recursive?: boolean;
+  depth?: number;
 };
 
 export type WalkDirOutput = {

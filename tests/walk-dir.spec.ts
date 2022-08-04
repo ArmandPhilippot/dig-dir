@@ -84,23 +84,44 @@ test('returns the correct number of properties', async (t) => {
   });
 });
 
-test('returns root subdirectories content if recursive', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { recursive: true });
+test('returns all subdirectories contents if depth not set', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { depth: undefined });
   const rootDirectories = getSubdirectoriesIn(root);
 
-  rootDirectories.forEach((subDir) => {
-    t.truthy(subDir.files);
-    t.truthy(subDir.subdirectories);
-  });
+  const checkTruthyContentsIn = (directories: Directory[]) => {
+    directories.forEach((dir) => {
+      t.truthy(dir.files);
+      t.truthy(dir.subdirectories);
+
+      if (dir.subdirectories) checkTruthyContentsIn(dir.subdirectories);
+    });
+  };
+
+  checkTruthyContentsIn(rootDirectories);
 });
 
-test('does not return root subdirectories content if not recursive', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { recursive: false });
+test('does not return root subdirectories content if depth equal 0', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { depth: 0 });
   const rootDirectories = getSubdirectoriesIn(root);
 
   rootDirectories.forEach((subDir) => {
     t.falsy(subDir.files);
     t.falsy(subDir.subdirectories);
+  });
+});
+
+test('returns subdirectories until allowed depth is reached', async (t) => {
+  const root = await walkDir(FIXTURES_PATH, { depth: 1 });
+  const rootDirectories = getSubdirectoriesIn(root);
+
+  rootDirectories.forEach((subDir) => {
+    t.truthy(subDir.files);
+    t.truthy(subDir.subdirectories);
+
+    subDir.subdirectories?.forEach((subDir) => {
+      t.falsy(subDir.files);
+      t.falsy(subDir.subdirectories);
+    });
   });
 });
 
@@ -125,7 +146,6 @@ test('does not include files content if option is deactivated', async (t) => {
 test('returns only directories when filtering by directory filetype', async (t) => {
   const root = await walkDir(FIXTURES_PATH, {
     filters: { type: FileType.DIRECTORY },
-    recursive: true,
   });
 
   root.forEach((fileOrDir) => {
@@ -137,7 +157,6 @@ test('returns only directories when filtering by directory filetype', async (t) 
 test('returns only files when filtering by file filetype', async (t) => {
   const root = await walkDir(FIXTURES_PATH, {
     filters: { type: FileType.FILE },
-    recursive: true,
   });
 
   root.forEach((fileOrDir) => {
@@ -149,7 +168,6 @@ test('returns only files and/or directories with the given filename', async (t) 
   const filename = '-1';
   const root = await walkDir(FIXTURES_PATH, {
     filters: { filename },
-    recursive: true,
   });
   const filenameRegex = new RegExp(filename, 'i');
 
@@ -177,7 +195,6 @@ test('returns only files of the given extensions', async (t) => {
   const extRegex = extensions.join('||');
   const root = await walkDir(FIXTURES_PATH, {
     filters: { extensions },
-    recursive: true,
   });
 
   const doesExtensionMatchRegex = (extension: Extension) => {
