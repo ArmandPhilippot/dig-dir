@@ -9,7 +9,7 @@ Walk Dir retrieves data about the contents of a given directory but not about th
 Walk Dir gathers some additional data depending of the filetype:
 
 - If it is a file, Walk Dir will return the extension and optionally the file content as string.
-- If it is a directory, Walk Dir will return its files and its subdirectories if the recursive option is enabled.
+- If it is a directory, Walk Dir will return its files and its subdirectories except when max depth is reached.
 
 ## Install
 
@@ -41,7 +41,7 @@ Walk Dir accept three parameters:
 
 - `root`: An absolute path pointing to the directory to browse,
 - `options`: An object containing some options regarding Walk Dir output,
-- `acc`: An accumulator to keep track of the root path when using recursive option. **You should not override it.**
+- `acc`: An accumulator to keep track of the root path with depth option. **You should not override it.**
 
 ### Options
 
@@ -49,9 +49,9 @@ You can pass some options to Walk Dir as an object:
 
 - `filters`: An object of filters to exclude some directories and/or files,
 - `includeFileContent`: If active, each file encountered will be read and WalkDir will return the content,
-- `recursive`: If active, Walk Dir will also read subdirectories until their is no more path to explore. If inactive, Walk Dir only returns the directories and files inside the given path.
+- `depth`: If `undefined`, Walk Dir will also read subdirectories until there is no more path to explore. If enabled, Walk Dir will returns the directories and files inside the given path until the given depth is reached.
 
-**Note:** If you do not provide options, by default, recursive is enabled, no filters are set and Walk Dir does not include file content.
+**Note:** By default, all options are undefined so Walk Dir will not include file content and it will continue until there is no more directory to explore.
 
 ### Filters
 
@@ -59,7 +59,7 @@ You can provide an object to filter the returned data.
 
 #### Extensions
 
-If you pass an array of extensions (starting with a dot), Walk Dir will only return files matching the given extensions. It will also return the directories to be able to look into subdirectories when recursive option is set.
+If you pass an array of extensions (starting with a dot), Walk Dir will only return files matching the given extensions. It will also return the directories to be able to look into subdirectories.
 
 Examples:
 
@@ -93,8 +93,8 @@ const dirData = await walkDir('some-path', {
 
 #### Type
 
-- `"file"` will only return files (in each subdirectory if recursive is set),
-- `"directory"` will only return directories (in each subdirectory if recursive is set),
+- `"file"` will only return files (including the ones in each subdirectory),
+- `"directory"` will only return directories (including the ones in each subdirectory),
 - `undefined` will return every files and directories encountered.
 
 Example:
@@ -237,7 +237,7 @@ WalkDir with default options will return this Javascript array of objects:
 
 **Why the accumulator should be ignored?**
 
-To avoid repeats, Walk Dir is calling itself when the recursive option is set. To be able to return the relative path instead of an absolute path, Walk Dir needs to keep track of the path you have given. Each time Walk Dir is called, the current path is pushed to the accumulator. So `acc[0]` will always match the given path.
+To avoid repeats, Walk Dir is calling itself until max depth is reached. To be able to return the relative path instead of an absolute path, Walk Dir needs to keep track of the path you have given. Each time Walk Dir is called, the current path is pushed to the accumulator. So `acc[0]` will always match the given path.
 
 **Why use a relative path?**
 
