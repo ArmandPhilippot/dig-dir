@@ -30,7 +30,7 @@
   ],
   "packageManager": "pnpm@7.5.1",
   "engines": {
-    "node": ">=14.6.0"
+    "node": ">= 14.17"
   },
   "scripts": {
     "build": "pnpm clean && pnpm tsc --build",
