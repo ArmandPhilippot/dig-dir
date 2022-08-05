@@ -1,7 +1,7 @@
 import { Dirent } from 'fs';
 import { readdir, readFile, stat } from 'fs/promises';
 import { basename, extname } from 'path';
-import { FileType } from './ts/enums.js';
+import { FileType } from './ts/enums';
 import {
   Directory,
   Extension,
@@ -12,7 +12,7 @@ import {
   TypeFilter,
   WalkDirOptions,
   WalkDirReturn,
-} from './ts/types.js';
+} from './ts/types';
 import {
   getFilesIn,
   getFiletype,
@@ -20,7 +20,7 @@ import {
   getSubdirectoriesIn,
   removeEmpty,
   shouldBeRecursive,
-} from './utils/helpers.js';
+} from './utils/helpers';
 
 /**
  * Retrieve the shared data between Directory and File objects.

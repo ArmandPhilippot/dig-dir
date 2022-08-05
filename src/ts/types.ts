@@ -1,4 +1,4 @@
-import { FileType } from './enums.js';
+import { FileType } from './enums';
 
 /**
  * Type can be of given type or undefined.

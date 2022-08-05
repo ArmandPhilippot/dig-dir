@@ -1,7 +1,7 @@
 import { Dirent } from 'fs';
 import { basename } from 'path';
-import { FileType } from '../ts/enums.js';
-import { Directory, FileOrDirectoryParent, RegularFile } from '../ts/types.js';
+import { FileType } from '../ts/enums';
+import { Directory, FileOrDirectoryParent, RegularFile } from '../ts/types';
 
 /**
  * Retrieve a FileType from a Dirent object.
