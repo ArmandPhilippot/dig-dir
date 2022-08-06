@@ -149,7 +149,7 @@ WalkDir with default options will return this Javascript array of objects:
           {
             createdAt: '2022-08-03T12:08:56.282Z',
             id: 'Li9mb2xkZXIxL3N1YkZvbGRlcjEvZG9jdW1lbnQub2R0',
-            name: 'document.odt',
+            name: 'document',
             parent: { name: 'subFolder1', path: './folder1/subFolder1' },
             path: './folder1/subFolder1/document.odt',
             type: 'file',
@@ -160,7 +160,7 @@ WalkDir with default options will return this Javascript array of objects:
           {
             createdAt: '2022-08-03T12:07:23.200Z',
             id: 'Li9mb2xkZXIxL3N1YkZvbGRlcjEvbm90ZS50eHQ=',
-            name: 'note.txt',
+            name: 'note',
             parent: { name: 'subFolder1', path: './folder1/subFolder1' },
             path: './folder1/subFolder1/note.txt',
             type: 'file',
@@ -196,7 +196,7 @@ WalkDir with default options will return this Javascript array of objects:
       {
         createdAt: '2022-08-03T12:07:50.463Z',
         id: 'Li9mb2xkZXIyL3JlYWRtZS5tZA==',
-        name: 'readme.md',
+        name: 'readme',
         parent: { name: 'folder2', path: './folder2' },
         path: './folder2/readme.md',
         type: 'file',
@@ -222,7 +222,7 @@ WalkDir with default options will return this Javascript array of objects:
   {
     createdAt: '2022-08-03T12:08:05.866Z',
     id: 'Li9yZWFkbWUubWQ=',
-    name: 'readme.md',
+    name: 'readme',
     parent: undefined,
     path: './readme.md',
     type: 'file',

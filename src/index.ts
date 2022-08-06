@@ -1,6 +1,6 @@
 import { Dirent } from 'fs';
 import { readdir, readFile, stat } from 'fs/promises';
-import { basename, extname } from 'path';
+import { extname, parse } from 'path';
 import {
   Directory,
   Extension,
@@ -39,7 +39,7 @@ const getSharedData = async <T extends FileType>(
   return {
     createdAt: birthtime.toISOString(),
     id: Buffer.from(paths.relative).toString('base64'),
-    name: basename(fileOrDir.name),
+    name: parse(fileOrDir.name).name,
     parent: getParent(paths.relative, fileOrDir.name),
     path: paths.relative,
     type: getFiletype(fileOrDir) as T,
