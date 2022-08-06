@@ -1,11 +1,16 @@
-import { FileType } from './enums.js';
+import { Type } from '../utils/constants.js';
 
 /**
  * Type can be of given type or undefined.
  */
 export type Maybe<T> = T | undefined;
 
+/**
+ * Either an empty string or a string starting with a dot.
+ */
 export type Extension = `.${string}` | '';
+
+export type FileType = typeof Type[keyof typeof Type];
 
 export type FileOrDirectoryParent = {
   name: string;
@@ -27,33 +32,54 @@ export type FileOrDirectory<T extends FileType = FileType> = {
   updatedAt: string;
 };
 
-export type Directory = FileOrDirectory<FileType.DIRECTORY> & {
+export type Directory = FileOrDirectory<'directory'> & {
   files?: RegularFile[];
   subdirectories?: Directory[];
 };
 
-export type RegularFile = FileOrDirectory<FileType.FILE> & {
+export type RegularFile = FileOrDirectory<'file'> & {
   content?: string;
-  extension?: Extension;
+  /**
+   * Either an extension or an empty string if file does not have an extension.
+   */
+  extension: Extension;
 };
 
-export type TypeFilter = FileType.DIRECTORY | FileType.FILE;
+export type TypeFilter = Exclude<FileType, 'unknown'>;
 
 export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
+  /**
+   * Filter by extension.
+   */
   extensions?: Extension[];
+  /**
+   * Filter by name (partial match).
+   */
   filename?: string;
+  /**
+   * Filter by filetype.
+   */
   type?: T;
 };
 
 export type WalkDirOptions<T extends Maybe<TypeFilter> = undefined> = {
+  /**
+   * Filters walk dir output.
+   */
   filters?: WalkDirFilters<T>;
+  /**
+   * Should we include each file contents?
+   */
   includeFileContent?: boolean;
+  /**
+   * Set the maximum depth.
+   */
   depth?: number;
 };
 
 export type WalkDirOutput = {
-  [FileType.DIRECTORY]: Directory[];
-  [FileType.FILE]: RegularFile[];
+  [Type.DIRECTORY]: Directory[];
+  [Type.FILE]: RegularFile[];
   undefined: (Directory | RegularFile)[];
 };
 

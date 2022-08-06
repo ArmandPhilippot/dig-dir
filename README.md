@@ -248,20 +248,10 @@ If you want to contribute to Walk Dir, first of all: thanks! Then, here a few in
 
 **A few notes:**
 
-- A git hook is set to run tests before pushing. If the push fails, you need to make the appropriate changes so that all tests work as expected. You can also run the tests manually with `pnpm test`. **Be aware:** the project needs to be built first to run the tests.
 - This project follows the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) rules. This is helpful to generate changelog and bump the version. So please, try to follow these guidelines.
+- A git hook is set to run tests before pushing. If the push fails, you need to make the appropriate changes so that all tests work as expected. You can also run the tests manually with `pnpm test`.
+- If you tweak the fixtures and you want to return to the initial state, you can clean them with `pnpm:test:fixtures:clean` then reinstall them with `pnpm test:fixtures:prepare`.
 - If you are familiar with unit testing, you can add your own tests. This project uses [Ava](https://github.com/avajs/ava). If you don't know this tool, please read the documentation before.
-
-* If you tweak the fixtures and you want to return to the initial state, you can clean them with `pnpm:test:fixtures:clean` then reinstall them with `pnpm test:fixtures:prepare`.
-
-Finally, if you are using VSCode, you might want to set these settings before importing files:
-
-```
-{
-  "typescript.preferences.importModuleSpecifier": "relative",
-  "typescript.preferences.importModuleSpecifierEnding": "js",
-}
-```
 
 ## FAQ
 
