@@ -1,18 +1,19 @@
 import { Dirent } from 'fs';
 import { readdir, readFile, stat } from 'fs/promises';
 import { basename, extname } from 'path';
-import { FileType } from './ts/enums';
 import {
   Directory,
   Extension,
   FileOrDirectory,
   FileOrDirectoryPaths,
+  FileType,
   Maybe,
   RegularFile,
   TypeFilter,
   WalkDirOptions,
   WalkDirReturn,
 } from './ts/types';
+import { Type } from './utils/constants';
 import {
   getFilesIn,
   getFiletype,
@@ -61,7 +62,7 @@ const getDirectoryData = async <T extends Maybe<TypeFilter> = undefined>(
   paths: FileOrDirectoryPaths,
   acc: string[]
 ): Promise<Directory> => {
-  const partialData = await getSharedData<FileType.DIRECTORY>(dir, paths);
+  const partialData = await getSharedData<typeof Type.DIRECTORY>(dir, paths);
   const dirData =
     shouldBeRecursive(paths.relative, options.depth) &&
     (await walkDir(paths.absolute, options, acc));
@@ -103,7 +104,7 @@ const getFileData = async <T extends Maybe<TypeFilter> = undefined>(
     return undefined;
   }
 
-  const partialData = await getSharedData<FileType.FILE>(file, paths);
+  const partialData = await getSharedData<typeof Type.FILE>(file, paths);
   const content = options.includeFileContent
     ? await readFile(paths.absolute, 'utf8')
     : undefined;
@@ -153,7 +154,7 @@ const readdirSafely = async (
  * @param {string[]} acc - An accumulator to keep track of starting path.
  * @returns {Promise<WalkDirReturn<T>>} The directory contents.
  */
-export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
+const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   root: string,
   options: WalkDirOptions<T> = {},
   acc: string[] = []
@@ -164,8 +165,8 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
   const initialPath = acc[0] || root;
 
   const { filters } = options;
-  const shouldOnlyIncludeFiles = filters?.type === FileType.FILE;
-  const shouldOnlyIncludeDirectories = filters?.type === FileType.DIRECTORY;
+  const shouldOnlyIncludeFiles = filters?.type === Type.FILE;
+  const shouldOnlyIncludeDirectories = filters?.type === Type.DIRECTORY;
 
   const data =
     rootData &&
@@ -180,11 +181,11 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
         const paths = { absolute: fileOrDirPath, relative: relativePath };
 
         switch (getFiletype(fileOrDir)) {
-          case FileType.DIRECTORY:
+          case Type.DIRECTORY:
             return shouldOnlyIncludeFiles
               ? undefined
               : getDirectoryData(fileOrDir, options, paths, acc);
-          case FileType.FILE:
+          case Type.FILE:
             return shouldOnlyIncludeDirectories
               ? undefined
               : getFileData(fileOrDir, options, paths);
@@ -198,3 +199,12 @@ export const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
 };
 
 export default walkDir;
+export type {
+  Directory,
+  Extension,
+  FileOrDirectory,
+  FileType,
+  RegularFile,
+  TypeFilter,
+  WalkDirOptions,
+};

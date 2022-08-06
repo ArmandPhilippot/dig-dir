@@ -2,10 +2,10 @@ import anyTest, { TestFn } from 'ava';
 import { Dirent } from 'fs';
 import { readdir } from 'fs/promises';
 import { resolve } from 'path';
-import { walkDir } from '../dist/index.js';
-import { FileType } from '../dist/ts/enums.js';
-import { Directory, Extension, RegularFile } from '../dist/ts/types.js';
-import { getFilesIn, getSubdirectoriesIn } from '../dist/utils/helpers.js';
+import walkDir from '../src/index';
+import { Directory, Extension, RegularFile } from '../src/ts/types';
+import { Type } from '../src/utils/constants';
+import { getFilesIn, getSubdirectoriesIn } from '../src/utils/helpers';
 
 /**
  * Replicate `__dirname` variable.
@@ -62,7 +62,7 @@ test('returns the correct number of properties', async (t) => {
     t.truthy(fileOrDir.updatedAt);
     t.falsy(fileOrDir.parent);
 
-    if (fileOrDir.type === FileType.DIRECTORY) {
+    if (fileOrDir.type === Type.DIRECTORY) {
       t.truthy(fileOrDir.files);
       t.truthy(fileOrDir.subdirectories);
 
@@ -73,7 +73,7 @@ test('returns the correct number of properties', async (t) => {
       fileOrDir.subdirectories?.forEach((dir) => {
         t.truthy(dir.parent);
       });
-    } else if (fileOrDir.type === FileType.FILE) {
+    } else if (fileOrDir.type === Type.FILE) {
       if (fileOrDir.extension !== undefined) {
         t.regex(fileOrDir.extension, extensionRegex);
       } else {
@@ -145,22 +145,22 @@ test('does not include files content if option is deactivated', async (t) => {
 
 test('returns only directories when filtering by directory filetype', async (t) => {
   const root = await walkDir(FIXTURES_PATH, {
-    filters: { type: FileType.DIRECTORY },
+    filters: { type: Type.DIRECTORY },
   });
 
   root.forEach((fileOrDir) => {
-    t.is(fileOrDir.type, FileType.DIRECTORY);
+    t.is(fileOrDir.type, Type.DIRECTORY);
     t.is(fileOrDir.files?.length, 0);
   });
 });
 
 test('returns only files when filtering by file filetype', async (t) => {
   const root = await walkDir(FIXTURES_PATH, {
-    filters: { type: FileType.FILE },
+    filters: { type: Type.FILE },
   });
 
   root.forEach((fileOrDir) => {
-    t.is(fileOrDir.type, FileType.FILE);
+    t.is(fileOrDir.type, Type.FILE);
   });
 });
 
@@ -180,7 +180,7 @@ test('returns only files and/or directories with the given filename', async (t) 
       filesOrDirs.forEach((fileOrDir) => {
         doesFilenameMatchRegex(fileOrDir.name);
 
-        if (fileOrDir.type === FileType.DIRECTORY) {
+        if (fileOrDir.type === Type.DIRECTORY) {
           checkFilenames(fileOrDir.subdirectories);
           checkFilenames(fileOrDir.files);
         }
@@ -212,7 +212,7 @@ test('returns only files of the given extensions', async (t) => {
   const checkExtensions = (filesOrDirs?: (Directory | RegularFile)[]) => {
     if (filesOrDirs)
       filesOrDirs.forEach((fileOrDir) => {
-        if (fileOrDir.type === FileType.FILE) {
+        if (fileOrDir.type === Type.FILE) {
           checkFileExtension(fileOrDir);
         } else {
           checkFilesExtensions(fileOrDir.files);

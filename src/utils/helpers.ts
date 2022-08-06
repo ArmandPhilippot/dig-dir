@@ -1,7 +1,12 @@
 import { Dirent } from 'fs';
 import { basename } from 'path';
-import { FileType } from '../ts/enums';
-import { Directory, FileOrDirectoryParent, RegularFile } from '../ts/types';
+import {
+  Directory,
+  FileOrDirectoryParent,
+  FileType,
+  RegularFile,
+} from '../ts/types';
+import { Type } from './constants';
 
 /**
  * Retrieve a FileType from a Dirent object.
@@ -10,9 +15,9 @@ import { Directory, FileOrDirectoryParent, RegularFile } from '../ts/types';
  * @returns {FileType} The matching FileType.
  */
 export const getFiletype = (dirent: Dirent): FileType => {
-  if (dirent.isDirectory()) return FileType.DIRECTORY;
-  if (dirent.isFile()) return FileType.FILE;
-  return FileType.UNKNOWN;
+  if (dirent.isDirectory()) return Type.DIRECTORY;
+  if (dirent.isFile()) return Type.FILE;
+  return Type.UNKNOWN;
 };
 
 /**
@@ -36,7 +41,7 @@ export const getSubdirectoriesIn = (
   dir: (Directory | RegularFile)[]
 ): Directory[] => {
   return dir.filter(
-    (fileOrDir) => fileOrDir.type === FileType.DIRECTORY
+    (fileOrDir) => fileOrDir.type === Type.DIRECTORY
   ) as Directory[];
 };
 
@@ -48,7 +53,7 @@ export const getSubdirectoriesIn = (
  */
 export const getFilesIn = (dir: (Directory | RegularFile)[]): RegularFile[] => {
   return dir.filter(
-    (fileOrDir) => fileOrDir.type === FileType.FILE
+    (fileOrDir) => fileOrDir.type === Type.FILE
   ) as RegularFile[];
 };
 
