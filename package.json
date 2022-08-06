@@ -23,9 +23,18 @@
     "traverse"
   ],
   "type": "module",
+  "files": [
+    "dist/**"
+  ],
   "main": "dist/walk-dir.js",
   "module": "dist/walk-dir.mjs",
   "types": "dist/walk-dir.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/walk-dir.js",
+      "import": "./dist/walk-dir.mjs"
+    }
+  },
   "packageManager": "pnpm@7.5.1",
   "engines": {
     "node": ">= 14.17"
