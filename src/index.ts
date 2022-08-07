@@ -10,8 +10,8 @@ import {
   Maybe,
   RegularFile,
   TypeFilter,
-  WalkDirOptions,
-  WalkDirReturn,
+  DigDirOptions,
+  DigDirReturn,
 } from './ts/types';
 import { Type } from './utils/constants';
 import {
@@ -51,21 +51,21 @@ const getSharedData = async <T extends FileType>(
  * Retrieve a Directory object.
  *
  * @param {Dirent} dir - A Dirent object.
- * @param {WalkDirOptions<T>} options - The walkDir options.
+ * @param {DigDirOptions<T>} options - The digDir options.
  * @param {FileOrDirectoryPaths} paths - A paths object (absolute and relative).
- * @param {string[]} acc - The walkDir accumulator.
+ * @param {string[]} acc - The digDir accumulator.
  * @returns {Promise<Directory>} The Directory object.
  */
 const getDirectoryData = async <T extends Maybe<TypeFilter> = undefined>(
   dir: Dirent,
-  options: WalkDirOptions<T>,
+  options: DigDirOptions<T>,
   paths: FileOrDirectoryPaths,
   acc: string[]
 ): Promise<Directory> => {
   const partialData = await getSharedData<typeof Type.DIRECTORY>(dir, paths);
   const dirData =
     shouldBeRecursive(paths.relative, options.depth) &&
-    (await walkDir(paths.absolute, options, acc));
+    (await digDir(paths.absolute, options, acc));
   const dirChildren = dirData
     ? {
         files: getFilesIn(dirData),
@@ -82,17 +82,17 @@ const getDirectoryData = async <T extends Maybe<TypeFilter> = undefined>(
 /**
  * Retrieve a RegularFile object.
  *
- * If the  walkDir extensions option is set, the return value can be undefined.
+ * If the  digDir extensions option is set, the return value can be undefined.
  * Otherwise, it will be a RegularFile object.
  *
  * @param {Dirent} file - A Dirent object.
- * @param {WalkDirOptions<T>} options - The walkDir options.
+ * @param {DigDirOptions<T>} options - The digDir options.
  * @param {FileOrDirectoryPaths} paths - A paths object (absolute and relative).
  * @returns {Promise<RegularFile | undefined>} Maybe the RegularFile object.
  */
 const getFileData = async <T extends Maybe<TypeFilter> = undefined>(
   file: Dirent,
-  options: WalkDirOptions<T>,
+  options: DigDirOptions<T>,
   paths: FileOrDirectoryPaths
 ): Promise<RegularFile | undefined> => {
   const extension = extname(file.name) as Extension;
@@ -120,7 +120,7 @@ const getFileData = async <T extends Maybe<TypeFilter> = undefined>(
  * Retrieve a directory contents.
  *
  * @param {string} path - An absolute path to a directory.
- * @param {string[]} acc - The walkDir accumulator.
+ * @param {string[]} acc - The digDir accumulator.
  * @returns {Promise<Dirent[] | undefined>} The directory contents if readable.
  */
 const readdirSafely = async (
@@ -143,22 +143,22 @@ const readdirSafely = async (
 };
 
 /**
- * Walk through a directory.
+ * Browse a directory tree and extract some children data.
  *
- * If a protected directory is inside the root path, WalkDir will return some
- * info about the protected directory but not its contents. If the protected
- * directory is the root path, an error will be thrown.
+ * Be aware: If a protected directory is inside the root path, DigDir will
+ * return some info about the protected directory but not its contents. If the
+ * protected directory is the root path, an error will be thrown.
  *
  * @param {string} root - An absolute path pointing to the starting directory.
- * @param {WalkDirOptions<T>} options - An object of options.
+ * @param {DigDirOptions<T>} options - An object of options.
  * @param {string[]} acc - An accumulator to keep track of starting path.
- * @returns {Promise<WalkDirReturn<T>>} The directory contents.
+ * @returns {Promise<DigDirReturn<T>>} The directory contents.
  */
-const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
+const digDir = async <T extends Maybe<TypeFilter> = undefined>(
   root: string,
-  options: WalkDirOptions<T> = {},
+  options: DigDirOptions<T> = {},
   acc: string[] = []
-): Promise<WalkDirReturn<T>> => {
+): Promise<DigDirReturn<T>> => {
   const rootData = await readdirSafely(root, acc);
 
   acc.push(root);
@@ -195,10 +195,10 @@ const walkDir = async <T extends Maybe<TypeFilter> = undefined>(
       })
     ));
 
-  return data?.filter(removeEmpty) as WalkDirReturn<T>;
+  return data?.filter(removeEmpty) as DigDirReturn<T>;
 };
 
-export default walkDir;
+export default digDir;
 export type {
   Directory,
   Extension,
@@ -206,5 +206,5 @@ export type {
   FileType,
   RegularFile,
   TypeFilter,
-  WalkDirOptions,
+  DigDirOptions,
 };

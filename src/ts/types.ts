@@ -47,7 +47,7 @@ export type RegularFile = FileOrDirectory<'file'> & {
 
 export type TypeFilter = Exclude<FileType, 'unknown'>;
 
-export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
+export type DigDirFilters<T extends Maybe<TypeFilter> = undefined> = {
   /**
    * Filter by extension.
    */
@@ -62,11 +62,11 @@ export type WalkDirFilters<T extends Maybe<TypeFilter> = undefined> = {
   type?: T;
 };
 
-export type WalkDirOptions<T extends Maybe<TypeFilter> = undefined> = {
+export type DigDirOptions<T extends Maybe<TypeFilter> = undefined> = {
   /**
-   * Filters walk dir output.
+   * Filters digdir output.
    */
-  filters?: WalkDirFilters<T>;
+  filters?: DigDirFilters<T>;
   /**
    * Should we include each file contents?
    */
@@ -77,13 +77,13 @@ export type WalkDirOptions<T extends Maybe<TypeFilter> = undefined> = {
   depth?: number;
 };
 
-export type WalkDirOutput = {
+export type DigDirOutput = {
   [Type.DIRECTORY]: Directory[];
   [Type.FILE]: RegularFile[];
   undefined: (Directory | RegularFile)[];
 };
 
-export type WalkDirReturn<
+export type DigDirReturn<
   T extends Maybe<TypeFilter> = undefined,
-  V extends keyof WalkDirOutput = T extends undefined ? 'undefined' : T
-> = WalkDirOutput[V];
+  V extends keyof DigDirOutput = T extends undefined ? 'undefined' : T
+> = DigDirOutput[V];

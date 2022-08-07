@@ -12,13 +12,13 @@ export default [
   bundle({
     output: [
       {
-        file: `dist/walk-dir.js`,
+        file: `dist/dig-dir.js`,
         format: 'cjs',
         sourcemap: true,
         exports: 'default',
       },
       {
-        file: `dist/walk-dir.mjs`,
+        file: `dist/dig-dir.mjs`,
         format: 'es',
         sourcemap: true,
       },
@@ -32,7 +32,7 @@ export default [
   }),
   bundle({
     output: {
-      file: `dist/walk-dir.d.ts`,
+      file: `dist/dig-dir.d.ts`,
       format: 'es',
     },
     plugins: [dts()],

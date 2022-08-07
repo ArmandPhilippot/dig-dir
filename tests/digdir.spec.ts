@@ -2,7 +2,7 @@ import anyTest, { TestFn } from 'ava';
 import { Dirent } from 'fs';
 import { readdir } from 'fs/promises';
 import { resolve } from 'path';
-import walkDir from '../src/index';
+import digDir from '../src/index';
 import { Directory, Extension, RegularFile } from '../src/ts/types';
 import { Type } from '../src/utils/constants';
 import { getFilesIn, getSubdirectoriesIn } from '../src/utils/helpers';
@@ -39,7 +39,7 @@ test('returns the correct number of files & directories in root folder', async (
   const directoriesFixturesCount = t.context.fixtures.filter((fileOrDir) =>
     fileOrDir.isDirectory()
   ).length;
-  const root = await walkDir(FIXTURES_PATH);
+  const root = await digDir(FIXTURES_PATH);
   const rootDirectories = getSubdirectoriesIn(root);
   const rootFiles = getFilesIn(root);
 
@@ -49,7 +49,7 @@ test('returns the correct number of files & directories in root folder', async (
 });
 
 test('returns the correct number of properties', async (t) => {
-  const root = await walkDir(FIXTURES_PATH);
+  const root = await digDir(FIXTURES_PATH);
 
   const extensionRegex = /^\.||''/;
 
@@ -85,7 +85,7 @@ test('returns the correct number of properties', async (t) => {
 });
 
 test('returns all subdirectories contents if depth not set', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { depth: undefined });
+  const root = await digDir(FIXTURES_PATH, { depth: undefined });
   const rootDirectories = getSubdirectoriesIn(root);
 
   const checkTruthyContentsIn = (directories: Directory[]) => {
@@ -101,7 +101,7 @@ test('returns all subdirectories contents if depth not set', async (t) => {
 });
 
 test('does not return root subdirectories content if depth equal 0', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { depth: 0 });
+  const root = await digDir(FIXTURES_PATH, { depth: 0 });
   const rootDirectories = getSubdirectoriesIn(root);
 
   rootDirectories.forEach((subDir) => {
@@ -111,7 +111,7 @@ test('does not return root subdirectories content if depth equal 0', async (t) =
 });
 
 test('returns subdirectories until allowed depth is reached', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { depth: 1 });
+  const root = await digDir(FIXTURES_PATH, { depth: 1 });
   const rootDirectories = getSubdirectoriesIn(root);
 
   rootDirectories.forEach((subDir) => {
@@ -126,7 +126,7 @@ test('returns subdirectories until allowed depth is reached', async (t) => {
 });
 
 test('includes files content if option is activated', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { includeFileContent: true });
+  const root = await digDir(FIXTURES_PATH, { includeFileContent: true });
   const rootFiles = getFilesIn(root);
 
   rootFiles.forEach((file) => {
@@ -135,7 +135,7 @@ test('includes files content if option is activated', async (t) => {
 });
 
 test('does not include files content if option is deactivated', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, { includeFileContent: false });
+  const root = await digDir(FIXTURES_PATH, { includeFileContent: false });
   const rootFiles = getFilesIn(root);
 
   rootFiles.forEach((file) => {
@@ -144,7 +144,7 @@ test('does not include files content if option is deactivated', async (t) => {
 });
 
 test('returns only directories when filtering by directory filetype', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, {
+  const root = await digDir(FIXTURES_PATH, {
     filters: { type: Type.DIRECTORY },
   });
 
@@ -155,7 +155,7 @@ test('returns only directories when filtering by directory filetype', async (t) 
 });
 
 test('returns only files when filtering by file filetype', async (t) => {
-  const root = await walkDir(FIXTURES_PATH, {
+  const root = await digDir(FIXTURES_PATH, {
     filters: { type: Type.FILE },
   });
 
@@ -166,7 +166,7 @@ test('returns only files when filtering by file filetype', async (t) => {
 
 test('returns only files and/or directories with the given filename', async (t) => {
   const filename = '-1';
-  const root = await walkDir(FIXTURES_PATH, {
+  const root = await digDir(FIXTURES_PATH, {
     filters: { filename },
   });
   const filenameRegex = new RegExp(filename, 'i');
@@ -193,7 +193,7 @@ test('returns only files and/or directories with the given filename', async (t) 
 test('returns only files of the given extensions', async (t) => {
   const extensions: Extension[] = ['.md', '.doc'];
   const extRegex = extensions.join('||');
-  const root = await walkDir(FIXTURES_PATH, {
+  const root = await digDir(FIXTURES_PATH, {
     filters: { extensions },
   });
 
@@ -228,7 +228,7 @@ test('throws an error if path does not exist', async (t) => {
   const nonexistingPath = './non-existing-folder';
 
   const error = await t.throwsAsync(async () => {
-    await walkDir(nonexistingPath);
+    await digDir(nonexistingPath);
   });
 
   if (error) t.regex(error.message, /no such file or directory/i);

@@ -1,6 +1,6 @@
 {
-  "name": "walk-dir",
-  "description": "Walk a directory tree with Node.js",
+  "name": "dig-dir",
+  "description": "Browse a directory tree and extract some children data.",
   "version": "0.1.0",
   "license": "MIT",
   "author": {
@@ -8,31 +8,36 @@
     "email": "contact@armandphilippot.com",
     "url": "https://www.armandphilippot.com/"
   },
-  "homepage": "https://github.com/ArmandPhilippot/walk-dir#readme",
+  "homepage": "https://github.com/ArmandPhilippot/dig-dir#readme",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:ArmandPhilippot/walk-dir.git"
+    "url": "git+ssh://git@github.com:ArmandPhilippot/dig-dir.git"
   },
   "bugs": {
-    "url": "https://github.com/ArmandPhilippot/walk-dir/issues"
+    "url": "https://github.com/ArmandPhilippot/dig-dir/issues"
   },
   "keywords": [
-    "walk",
+    "browse",
+    "directory",
+    "file",
     "read",
+    "parse",
+    "read",
+    "traverse",
     "tree",
-    "traverse"
+    "walk"
   ],
   "type": "module",
   "files": [
     "dist/**"
   ],
-  "main": "dist/walk-dir.js",
-  "module": "dist/walk-dir.mjs",
-  "types": "dist/walk-dir.d.ts",
+  "main": "dist/dig-dir.js",
+  "module": "dist/dig-dir.mjs",
+  "types": "dist/dig-dir.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/walk-dir.js",
-      "import": "./dist/walk-dir.mjs"
+      "require": "./dist/dig-dir.js",
+      "import": "./dist/dig-dir.mjs"
     }
   },
   "packageManager": "pnpm@7.5.1",

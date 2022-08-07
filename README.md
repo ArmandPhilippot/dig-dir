@@ -1,57 +1,57 @@
-# Walk Dir
+# DigDir
 
-Walk a directory tree with Node.js
+Browse a directory tree with Node.js and extract some children data.
 
 ## Description
 
-Walk Dir retrieves data about the contents of a given directory but not about the directory itself. For each file and subdirectory encountered it will create an object with the filetype, the name, the relative path, the creation date, the update date, the parent (if nested) and an id generated from the relative path.
+DigDir retrieves data about the contents of a given directory but not about the directory itself. For each file and subdirectory encountered it will create an object with the filetype, the name, the relative path, the creation date, the update date, the parent (if nested) and an id generated from the relative path.
 
-Walk Dir gathers some additional data depending of the filetype:
+DigDir gathers some additional data depending of the filetype:
 
-- If it is a file, Walk Dir will return the extension and optionally the file content as string.
-- If it is a directory, Walk Dir will return its files and its subdirectories except when max depth is reached.
+- If it is a file, DigDir will return the extension and optionally the file content as string.
+- If it is a directory, DigDir will return its files and its subdirectories except when max depth is reached.
 
 ## Install
 
 ```bash
 # With npm
-npm install walk-dir
+npm install dig-dir
 
 # With yarn
-yarn add walk-dir
+yarn add dig-dir
 
 # With pnpm
-pnpm add walk-dir
+pnpm add dig-dir
 ```
 
 ## Usage
 
 ```javascript
 import { resolve } from 'path';
-import walkDir from 'walk-dir';
+import digDir from 'dig-dir';
 
 const currentPath = new URL('.', import.meta.url).pathname;
 const dirPath = resolve(currentPath, './relative-path');
-const dirContents = await walkDir(dirPath);
+const dirContents = await digDir(dirPath);
 ```
 
 ## Parameters
 
-Walk Dir accept three parameters:
+DigDir accept three parameters:
 
 - `root`: An absolute path pointing to the directory to browse,
-- `options`: An object containing some options regarding Walk Dir output,
+- `options`: An object containing some options regarding DigDir output,
 - `acc`: An accumulator to keep track of the root path with depth option. **You should not override it.**
 
 ### Options
 
-You can pass some options to Walk Dir as an object:
+You can pass some options to DigDir as an object:
 
 - `filters`: An object of filters to exclude some directories and/or files,
-- `includeFileContent`: If active, each file encountered will be read and WalkDir will return the content,
-- `depth`: If `undefined`, Walk Dir will also read subdirectories until there is no more path to explore. If enabled, Walk Dir will returns the directories and files inside the given path until the given depth is reached.
+- `includeFileContent`: If active, each file encountered will be read and DigDir will return the content,
+- `depth`: If `undefined`, DigDir will also read subdirectories until there is no more path to explore. If enabled, DigDir will returns the directories and files inside the given path until the given depth is reached.
 
-**Note:** By default, all options are undefined so Walk Dir will not include file content and it will continue until there is no more directory to explore.
+**Note:** By default, all options are undefined so DigDir will not include file content and it will continue until there is no more directory to explore.
 
 ### Filters
 
@@ -59,36 +59,35 @@ You can provide an object to filter the returned data.
 
 #### Extensions
 
-If you pass an array of extensions (starting with a dot), Walk Dir will only return files matching the given extensions. It will also return the directories to be able to look into subdirectories.
+If you pass an array of extensions (starting with a dot), DigDir will only return files matching the given extensions. It will also return the directories to be able to look into subdirectories.
 
 Examples:
 
 ```javascript
 // Only retrieve Markdown files.
-const dirData = await walkDir('some-path', {
+const dirData = await digDir('some-path', {
   filters: { extensions: ['.md'] },
 });
 
 // Retrieve text and Markdown files.
-const dirData = await walkDir('some-path', {
+const dirData = await digDir('some-path', {
   filters: extensions: ['.txt', '.md'],
 });
 ```
 
 #### Filename
 
-If provided, Walk Dir will return only directories and/or files which contain the filename (it does not look for an exact match).
+If provided, DigDir will return only directories and/or files which contain the filename (it does not look for an exact match).
 
 Example:
 
 ```javascript
-const dirData = await walkDir('some-path', {
+const dirData = await digDir('some-path', {
   filters: { filename: 'and' },
 });
 
-// dirData could contain an array with directories named `andy` or
-// `armand` and a file named `tandem`. But a directory named `images`
-// will not be returned.
+// dirData could contain an array with directories named `andy` or `armand` and
+// a file named `tandem`. But a directory named `images` will not be returned.
 ```
 
 #### Type
@@ -101,7 +100,7 @@ Example:
 
 ```javascript
 // Retrieve only directories
-const dirData = await walkDir('some-path', {
+const dirData = await digDir('some-path', {
   filters: { type: 'directory' },
 });
 ```
@@ -123,7 +122,7 @@ root
 └── readme.md
 ```
 
-WalkDir with default options will return this Javascript array of objects:
+DigDir with default options will return this Javascript array of objects:
 
 ```javascript
 [
@@ -235,7 +234,7 @@ WalkDir with default options will return this Javascript array of objects:
 
 ## Development
 
-If you want to contribute to Walk Dir, first of all: thanks! Then, here a few instructions:
+If you want to contribute to DigDir, first of all: thanks! Then, here a few instructions:
 
 1. You need `pnpm` installed,
 2. Clone the project,
@@ -257,13 +256,19 @@ If you want to contribute to Walk Dir, first of all: thanks! Then, here a few in
 
 **Why the accumulator should be ignored?**
 
-To avoid repeats, Walk Dir is calling itself until max depth is reached. To be able to return the relative path instead of an absolute path, Walk Dir needs to keep track of the path you have given. Each time Walk Dir is called, the current path is pushed to the accumulator. So `acc[0]` will always match the given path.
+To avoid repeats, DigDir is calling itself until max depth is reached. To be able to return the relative path instead of an absolute path, DigDir needs to keep track of the path you have given. Each time DigDir is called, the current path is pushed to the accumulator. So `acc[0]` will always match the given path.
 
 **Why use a relative path?**
 
 I estimate that the relative path can be useful but the absolute path should not be public.
 
-As a developer, you know where is the starting path so you can easily retrieve the path which could cause an error from the relative path. However, if you want to use the Walk Dir data through an API, I think it is preferable to not provide the full path.
+As a developer, you know where is the starting path so you can easily retrieve the path which could cause an error from the relative path. However, if you want to use the DigDir data through an API, I think it is preferable to not provide the full path.
+
+**Why DigDir?**
+
+At first, I whish to name this package Walk Dir, but the name and its variants was already taken in the npm public space. I prefer to release this package as unscoped package so I had to look for another available name. DigDir was available and it seems appropriate. The idea is to dig into a directory to extract data about its children (and their children, so dig deeper).
+
+So, if in the repository's history you find some mentions of "walk dir" (in different case), it was the previous name of this package.
 
 ## License
 
