@@ -26,13 +26,26 @@ pnpm add dig-dir
 
 ## Usage
 
+### ESM
+
 ```javascript
 import { resolve } from 'path';
 import digDir from 'dig-dir';
 
 const currentPath = new URL('.', import.meta.url).pathname;
-const dirPath = resolve(currentPath, './relative-path');
-const dirContents = await digDir(dirPath);
+const dirPath = resolve(currentPath, './relative-dir-path');
+const dirData = await digDir(dirPath);
+console.log(dirData);
+```
+
+### CommonJS
+
+```javascript
+const digDir = require('dig-dir');
+const path = require('path');
+
+const dirPath = path.resolve(__dirname, './relative-dir-path');
+digDir(dirPath).then((dirData) => console.log(dirData));
 ```
 
 ## Parameters
