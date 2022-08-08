@@ -12,10 +12,10 @@ export default [
   bundle({
     output: [
       {
-        file: `dist/dig-dir.js`,
+        file: `dist/dig-dir.cjs`,
         format: 'cjs',
         sourcemap: true,
-        exports: 'default',
+        exports: 'auto',
       },
       {
         file: `dist/dig-dir.mjs`,

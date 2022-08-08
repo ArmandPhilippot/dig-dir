@@ -31,12 +31,12 @@
   "files": [
     "dist/**"
   ],
-  "main": "dist/dig-dir.js",
+  "main": "dist/dig-dir.cjs",
   "module": "dist/dig-dir.mjs",
   "types": "dist/dig-dir.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/dig-dir.js",
+      "require": "./dist/dig-dir.cjs",
       "import": "./dist/dig-dir.mjs"
     }
   },
