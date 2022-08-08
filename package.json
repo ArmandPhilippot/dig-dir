@@ -50,7 +50,7 @@
     "fix": "eslint --fix --ext .js,.ts --ignore-path .gitignore",
     "lint": "tsc --noEmit && eslint --ext .js,.ts --ignore-path .gitignore",
     "prepare": "husky install && pnpm build",
-    "release": "standard-version -s",
+    "release": "standard-version -a -s",
     "test": "ava",
     "test:fixtures:clean": "sh bin/remove-test-fixtures.sh",
     "test:fixtures:prepare": "sh bin/create-test-fixtures.sh",
@@ -77,5 +77,10 @@
     "rollup-plugin-esbuild": "^4.9.1",
     "standard-version": "^9.5.0",
     "typescript": "^4.7.4"
+  },
+  "standard-version": {
+    "scripts": {
+      "precommit": "git add CHANGELOG.md"
+    }
   }
 }
