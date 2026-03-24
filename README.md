@@ -2,6 +2,9 @@
 
 Browse a directory tree with Node.js and extract some children data.
 
+> [!WARNING]
+> This package is deprecated. I no longer have a use for it and don't plan to maintain it.
+
 ## Description
 
 DigDir retrieves data about the contents of a given directory but not about the directory itself. For each file and subdirectory encountered it will create an object with the filetype, the name, the relative path, the creation date, the update date, the parent (if nested) and an id generated from the relative path.
