@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/ArmandPhilippot/dig-dir/compare/v1.0.0...v1.1.0) (2026-03-24)
+
+### Features
+
+- deprecate package ([2534ac4](https://github.com/ArmandPhilippot/dig-dir/commit/2534ac43af81335cdc44b20f06863f0704b07c0f))
+
 ## 1.0.0 (2022-08-08)
 
 ### Features
